@@ -1,0 +1,28 @@
+name: Platform CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+
+      - name: Lint Helm
+        run: helm lint nginx-app
+
+      - name: Validate Kubernetes manifests
+        run: helm template nginx-app ./nginx-app > manifests.yaml
+
+      - name: Upload manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifests
+          path: manifests.yaml
+
